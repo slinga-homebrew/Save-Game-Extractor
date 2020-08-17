@@ -2,13 +2,11 @@
 Transmit Sega Saturn save game files as audio to backup on a PC. Based on the amazing [minimodem](https://github.com/kamalmostafa/minimodem). Currently transfer speeds are ~70 bits/second. Build with [Jo Engine](https://github.com/johannes-fetz/joengine) or download an ISO from [releases](https://github.com/slinga-homebrew/Save-Game-Extractor/releases).
 
 ## Demo Video
-[Demo Video](https://github.com/slinga-homebrew/Save-Game-Extractor/screenshots/demo.mkv)
+[Demo Video](https://github.com/slinga-homebrew/Save-Game-Extractor/blob/master/screenshots/demo.mkv)
 
 ## Screenshots
 ![Main](screenshots/main.png)
 ![List Saves](screenshots/saves.png)
-![Test Transmit](screenshots/test.png)
-![Test Recieve](screenshots/test_minimodem.png)
 ![Transmit](screenshots/transmit.png)
 ![Receive](screenshots/transmit_minimodem.png)
 
@@ -29,11 +27,11 @@ SGEX is not the only method to backup your Saturn save games. SGEX has the advan
 * Burn the SGEX ISO to disc and boot on your Saturn
 * Run minimodem on your PC in receive mode: minimodem -R 44100 -r 1200 --sync 0xAB --stopbits 4 --startbits 4
 * Within Save Game Extractor on your Saturn select the "Test Audio Transmission" option
-** Hit C to transmit audio
+    * Hit C to transmit audio
 
 ![Test Transmit](screenshots/test.png)
 
-** You should see the test message come across your screen:
+* You should see the test message come across your screen:
 
 ![Test Recieve](screenshots/test_minimodem.png)
 
@@ -44,7 +42,7 @@ SGEX is not the only method to backup your Saturn save games. SGEX has the advan
 
 * When your transfer is complete, stop the minimodem process
 * Run the Python script on the transmitted data: python sgex.py mysave.bin
-** The script should create the save game based on the transmitted data
+    ** The script should create the save game based on the transmitted data
 
 ![Receive](screenshots/transmit_minimodem.png)
 
@@ -91,7 +89,7 @@ Save Game Extractor uses code from:
 * [libcorrect](https://github.com/quiet/libcorrect) - BSD
 
 ## Saturn Save Games Collect Project
-Want to share your save games on the web? Send them to the (Save Games Collect)[https://ppcenter.webou.net/pskai/savedata/] project. Made by Cafe-Alpha, the author of the Gamer's Cartridge.
+Want to share your save games on the web? Send them to the [Save Games Collect](https://ppcenter.webou.net/pskai/savedata/) project. Made by Cafe-Alpha, the author of the Gamer's Cartridge.
 
 ## Credits
 Special thanks to Antime, Ponut, VBT, and everyone else at SegaXtreme keeping the Saturn dev. Thank you to Takashi for the original Save Game Copier idea back in ~2002.
