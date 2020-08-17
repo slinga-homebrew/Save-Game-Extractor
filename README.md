@@ -42,7 +42,7 @@ SGEX is not the only method to backup your Saturn save games. SGEX has the advan
 
 * When your transfer is complete, stop the minimodem process
 * Run the Python script on the transmitted data: python sgex.py mysave.bin
-    ** The script should create the save game based on the transmitted data
+    * The script should create the save game based on the transmitted data
 
 ![Receive](screenshots/transmit_minimodem.png)
 
