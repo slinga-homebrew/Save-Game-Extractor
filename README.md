@@ -11,15 +11,16 @@ Transmit Sega Saturn save game files as audio to backup on a PC. Based on the am
 ![Receive](screenshots/transmit_minimodem.png)
 
 ## Comparision to Other Game Save Transfer Methods
-SGEX is not the only method to backup your Saturn save games. SGEX has the advantage that it is cheap (costs a burned CD + Stereo Audio Y cable adapter), easily available, and supports extracting saves directly from a backup cartridge. The drawbacks are it's speed and that it requires a method to boot burned discs.
+SGEX is not the only method to backup Sega Saturn save games. SGEX has the advantage that it is cheap (costs a burned CD + stereo audio Y cable adapter), easily available, and supports extracting saves directly from a backup cartridge. The drawbacks are it's speed and that it requires a method to boot burned discs.
 
 | | Cheap and Easily Available | Supports Backup Cartridge | Fast | Doesn't Require Additional Jailbreak | Notes |
 | --------------- | --------------- | --------------- | --------------- | --------------- | --------------- |
 | SGEX | Yes | Yes | No | No | N/A |
+| [Save Game Manager](http://www.rockin-b.de/saturn-savegamemanager.html) | Yes | Yes | No | No | Another software only solution, SGM is an ISO you boot on your system to manage your saves. It's main purpose is to copy burned saves to your Saturn, but it has features for exported saves via hex code. I recommend using SGEX to get your saves off of the Saturn and using SGM to copy your saves back on. |
 | [NetLink](https://segaretro.org/NetLink_Internet_Modem) | No | No | Yes | Yes | It's a modem. It's most likely a pain but you could probably figure out a way to e-mail yourself saves from the internal memory. As it takes up the cartridge slot you obviously can't directly dump cartridge saves. |
-| [Saturn Floppy Drive](https://segaretro.org/Saturn_Floppy_Drive) | No | Yes | Yes | Yes | Saturn FDD is great except PCs can't read their disks. You can use SGEX to transfer your FDD saves to PC. Also $200-$300 on eBay. |
-| [Saturn Gamer's Cartridge](https://ppcenter.webou.net/satcart/#gamers) | No | No | Yes | Yes | Gamer's Cart is amazing but no longer being made. Has an SD slot to transfer save.  As it takes up the cartridge slot you obviously can't directly dump cartridge saves. |
-| [Satiator ODE](https://www.patreon.com/prof_abrasive) | No | Yes | Yes | Yes | Not released yet, but the Satiator is rumored to supported backing up saves to the ODE. Should support dumping saves from cartridges. Hopefully will be released at a good price. |
+| [Saturn Floppy Drive](https://segaretro.org/Saturn_Floppy_Drive) | No | Yes | Yes | Yes | Saturn FDD is great except PCs can't read their disks. You can use SGEX to transfer your FDD saves to PC. Also, the FDD is $200-$300 on eBay. |
+| [Saturn Gamer's Cartridge](https://ppcenter.webou.net/satcart/#gamers) | No | No | Yes | Yes | Gamer's Cart is amazing but no longer being made. Has an SD slot to transfer saves.  As it takes up the cartridge slot you obviously can't directly dump cartridge saves. |
+| [Satiator ODE](https://www.patreon.com/prof_abrasive) | No | Yes | Yes | Yes | Not released yet, but the Satiator is rumored to supported backing up saves to the ODE. Should support dumping saves from cartridges. Hopefully will be released at a reasonable price. |
 | [Action Replay](https://segaretro.org/Action_Replay) | No | No | Yes | Yes | Certain models of the Action Replay have a 25-pin DSUB connector on top. Homebrew has been written to copy data including saves from that port. As it takes up the cartridge slot you obviously can't directly dump cartridge saves.|
 
 ## Usage
