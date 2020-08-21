@@ -5,10 +5,17 @@
 # This script parses an encoded transmission from the Sega Saturn,
 # validates it, and writes it out to disk
 #
+# The transmission consists of a TRANSMISSION_HEADER followed by a
+# variable number of bytes of data. The transmission is zipped,
+# Reed Solomon encoded, and then escaped. This Python script
+# undoes all of that.
+#
+
 import sys
 import binascii
 import hashlib
 import reedsolo
+import zlib
 
 '''
 Taken from main.h
@@ -76,8 +83,6 @@ def main():
         print("Error: Input filename required")
         return -1
 
-    # Reed Solomon parameters must match settings used by libcorrect
-    rsc = reedsolo.RSCodec(nsym=32, nsize=255, fcr=1, prim=0x187)
 
     filename = sys.argv[1]
 
@@ -87,7 +92,10 @@ def main():
         print("Error: Could not open " + filename + " for reading")
         return -1
 
-    # the input file is an escaped string that is Reed Solomon encoded. The string consists of a TRANSMISSION_HEADER + variable length save data
+    #
+    # Unescape the buffer
+    #
+
     escapedBuf = inFile.read()
 
     # unescape the buffer
@@ -96,7 +104,13 @@ def main():
         print("Failed to unescape data, something is corrupt.");
         return -1
 
-    # Reed Solomon error correction
+    #
+    # Reed Solomon decode
+    #
+
+    # Reed Solomon parameters must match settings used by libcorrect
+    rsc = reedsolo.RSCodec(nsym=32, nsize=255, fcr=1, prim=0x187)
+
     try:
         decodedBuf = rsc.decode(unescapedBuf)
     except:
@@ -106,32 +120,42 @@ def main():
 
     print("Errors Corrected: " + str(len(decodedBuf[2])))
 
-    decodedBuf = decodedBuf[0]
+    compressedBuf = decodedBuf[0]
+
+    #
+    # Decompress the data
+    #
+    decompressedBuf = zlib.decompress(str(compressedBuf));
+
+    #
+    # TRANSMISSION_HEADER + variable length save data
+    #
 
     # sanity check the buffer
-    if len(decodedBuf) < TRANSMISSION_HEADER_SIZE:
+    if len(decompressedBuf) < TRANSMISSION_HEADER_SIZE:
         print("Error: " + filename + " is too small. Must be at least TRANSMISSION_HEADER_SIZE")
         return -1
 
     # SGEX magic bytes
-    magic = decodedBuf[0:4].decode("utf-8")
+    magic = decompressedBuf[0:4].decode("utf-8")
     if magic != MAGIC:
+        print magic
         print("Error: The magic bytes are invalid")
         return -1
 
-    saveSize = binascii.b2a_hex(decodedBuf[32:36])
+    saveSize = binascii.b2a_hex(decompressedBuf[32:36])
     saveSize = int(saveSize, 16)
 
     # validate length, shouldn't fail here because of the Reed Solomon check
-    if TRANSMISSION_HEADER_SIZE + saveSize != len(decodedBuf):
-        print("Error: Received incorrect number of bytes. Expected " + str(TRANSMISSION_HEADER_SIZE + saveSize) + ", got " + str(len(decodedBuf)))
+    if TRANSMISSION_HEADER_SIZE + saveSize != len(decompressedBuf):
+        print("Error: Received incorrect number of bytes. Expected " + str(TRANSMISSION_HEADER_SIZE + saveSize) + ", got " + str(len(decompressedBuf)))
         return -1
 
-    saveName = decodedBuf[20:31].decode("utf-8")
-    md5Hash = binascii.b2a_hex(decodedBuf[4:20]).decode("utf-8")
+    saveName = decompressedBuf[20:31].decode("utf-8")
+    md5Hash = binascii.b2a_hex(decompressedBuf[4:20]).decode("utf-8")
 
     # verify the MD5 hash. Again shouldn't ever fail here due to the Reed Solomon check
-    computedHashResult = hashlib.md5(decodedBuf[TRANSMISSION_HEADER_SIZE:])
+    computedHashResult = hashlib.md5(decompressedBuf[TRANSMISSION_HEADER_SIZE:])
     computedHash = computedHashResult.hexdigest()
 
     print("Transmitted Filename: " + saveName)
@@ -148,7 +172,7 @@ def main():
     # create the output file
     try:
         outFile = open(saveName, "wb")
-        outFile.write(decodedBuf[36:])
+        outFile.write(decompressedBuf[36:])
         outFile.close()
     except:
         print("Error writing save " + saveName + " to disk")

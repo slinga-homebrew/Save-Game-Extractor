@@ -30,8 +30,8 @@
 
 #include <jo/jo.h>
 #include "main.h"
-#include "encode.h"
 #include "util.h"
+#include "encode.h"
 #include "md5/md5.h"
 #include "saturn-minimodem.h"
 
@@ -623,13 +623,21 @@ void playSaves_draw(void)
     if(g_Game.md5Calculated == false)
     {
         unsigned int unencodedSize = 0;
-        MD5_CTX ctx = {0};
+        unsigned int uncompressedSize = 0;
+        unsigned char* compressedBuffer = NULL;
+        g_Game.compressedSize = 0;
 
-        MD5_Init(&ctx);
-        MD5_Update(&ctx, g_Game.saveFileData, g_Game.saveFileSize);
-        MD5_Final(g_Game.md5Hash, &ctx);
+        // print messages to the user so that can get an estimate of the time for longer operations
 
-        g_Game.md5Calculated = true;
+
+
+        result = calculateMD5Hash(g_Game.saveFileData, g_Game.saveFileSize, g_Game.md5Hash);
+        if(result != 0)
+        {
+            // something went wrong
+            transitionToState(STATE_MAIN);
+            return;
+        }
 
         // transmission header
         result = initializeTransmissionHeader(g_Game.md5Hash, sizeof(g_Game.md5Hash), g_Game.saveFilename, g_Game.saveFileSize);
@@ -641,9 +649,33 @@ void playSaves_draw(void)
         }
 
         //
-        // Reed Solomon encode the buffer
+        // Compress the save
         //
-        unencodedSize = TRANSMISSION_HEADER_SIZE + g_Game.saveFileSize;
+
+        // estimate the compressed output size
+        uncompressedSize = TRANSMISSION_HEADER_SIZE + g_Game.saveFileSize;
+        g_Game.compressedSize = compressOutSize(uncompressedSize);
+
+        compressedBuffer = jo_malloc(g_Game.compressedSize);
+        if(compressedBuffer == NULL)
+        {
+            jo_core_error("Failed to allocate compression buffer!!");
+            transitionToState(STATE_MAIN);
+            return;
+        }
+
+        result = compressBuffer(g_Game.transmissionData, uncompressedSize, compressedBuffer, &g_Game.compressedSize);
+        if(result != 0)
+        {
+            // something went wrong
+            transitionToState(STATE_MAIN);
+            return;
+        }
+
+        //
+        // Reed Solomon encode the compressed buffer
+        //
+        unencodedSize = g_Game.compressedSize;
         g_Game.encodedTransmissionSize = reedSolomonOutSize(unencodedSize);
 
         g_Game.encodedTransmissionData = jo_malloc(g_Game.encodedTransmissionSize);
@@ -653,18 +685,24 @@ void playSaves_draw(void)
             transitionToState(STATE_MAIN);
             return;
         }
-        memset(g_Game.encodedTransmissionData, 0, g_Game.encodedTransmissionSize);
+        jo_memset(g_Game.encodedTransmissionData, 0, g_Game.encodedTransmissionSize);
 
-        result = reedSolomonEncode(g_Game.transmissionData, unencodedSize, g_Game.encodedTransmissionData);
+        result = reedSolomonEncode(compressedBuffer, unencodedSize, g_Game.encodedTransmissionData);
         if(result != 0)
         {
             jo_core_error("Failed to Reed Solomon encode data!!");
             jo_free(g_Game.encodedTransmissionData);
+            jo_free(compressedBuffer);
             g_Game.encodedTransmissionData = NULL;
             g_Game.encodedTransmissionSize = 0;
             transitionToState(STATE_MAIN);
             return;
         }
+
+        // no longer need the compressed buffer
+        jo_memset(compressedBuffer, 0, g_Game.compressedSize);
+        jo_free(compressedBuffer);
+
 
         // escape the buffer if necessary
         result = escapeBuffer(&g_Game.encodedTransmissionData, &g_Game.encodedTransmissionSize);
@@ -676,10 +714,13 @@ void playSaves_draw(void)
             g_Game.encodedTransmissionSize = 0;
             transitionToState(STATE_MAIN);
         }
+
+        g_Game.md5Calculated = true;
     }
 
     jo_printf(OPTIONS_X, OPTIONS_Y + y++, "Filename: %s        ", g_Game.saveFilename);
     jo_printf(OPTIONS_X, OPTIONS_Y + y++, "Size: %d            ", g_Game.saveFileSize);
+    jo_printf(OPTIONS_X, OPTIONS_Y + y++, "Compressed Size: %d            ", g_Game.compressedSize);
     jo_printf(OPTIONS_X, OPTIONS_Y + y++, "Total Size: %d          ", g_Game.encodedTransmissionSize);
 
     result = SaturnMinimodem_transferStatus(&bytesTransferred, &totalSize);

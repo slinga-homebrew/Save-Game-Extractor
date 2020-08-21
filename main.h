@@ -30,7 +30,7 @@
 #pragma once
 
 // program version, keep this length to avoid having to resize strings
-#define VERSION "0.95"
+#define VERSION "0.96"
 
 // program states
 #define STATE_UNINITIALIZED      0
@@ -122,8 +122,12 @@ typedef struct _GAME
     unsigned char* transmissionData; // consists of TRANSMISSION_HEADER + variable length saveFileData
                                      // not encoded or escaped in any form
 
+    unsigned int compressedSize; // size after compression
+
     unsigned char* encodedTransmissionData; // transmission data encoded with Reed Solomon and later escaped
     unsigned int encodedTransmissionSize;  // number of bytes of encodedTransmissionata
+
+
 
     bool isTransmissionRunning;
 

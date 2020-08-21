@@ -68,7 +68,7 @@ With significant work it should be possible to increase the throughput. These ar
 * I don't have a way to detect if Cartridge Memory or External Memory is mounted without calling jo_mount_device(). Unfortunatly jo_mount_device() results in a jo_core_error() if the device is not mounted. This is an issue because I'm currently releasing the code as a debug build. Once I feel the codebase is stable I will cut a release build.
 * SGEX uses a lot of heap memory and makes a number of buffer copies. This will require refactoring to improve. I can also look into using DMA copies.
 * I capped the maximum number of saves to list at 50. I can adjust that number is needed
-* The maximum save file is capped at 128k. This can be adjusted. 
+* The maximum save file is capped at 128k. This can be adjusted.
 
 ## Receiving Dependencies
 * Python
@@ -88,6 +88,7 @@ Save Game Extractor uses code from:
 * [68k](https://github.com/ponut64/68k) - MIT
 * [MD5](http://openwall.info/wiki/people/solar/software/public-domain-source-code/md5) - BSD
 * [libcorrect](https://github.com/quiet/libcorrect) - BSD
+* [miniz](https://github.com/richgel999/miniz) - MIT
 
 ## Saturn Save Games Collect Project
 Want to share your save games on the web? Send them to the [Save Games Collect](https://ppcenter.webou.net/pskai/savedata/) project. Made by Cafe-Alpha, the author of the Gamer's Cartridge.

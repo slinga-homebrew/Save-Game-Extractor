@@ -2,6 +2,26 @@
 
 correct_reed_solomon* g_reedSolomon = NULL;
 
+// calculates the MD5 hash of buffer
+// md5Hash is an out parameter that must be at least MD5_HASH_SIZE (16) long
+// returns 0 on success
+int calculateMD5Hash(unsigned char* buffer, unsigned int bufferSize, unsigned char* md5Hash)
+{
+    MD5_CTX ctx = {0};
+
+    if(buffer == NULL || bufferSize == 0 || md5Hash == NULL)
+    {
+        jo_core_error("Invalid parameters to calculateMD5Hash!!");
+        return -1;
+    }
+
+    MD5_Init(&ctx);
+    MD5_Update(&ctx, buffer, bufferSize);
+    MD5_Final(md5Hash, &ctx);
+
+    return 0;
+}
+
 // initializes the transmission header consisting of:
 // - 4-byte signature SGEX
 // - md5hash
@@ -26,6 +46,74 @@ int initializeTransmissionHeader(unsigned char* md5Hash, unsigned int md5HashSiz
     memcpy(header->md5Hash, md5Hash, MD5_HASH_SIZE);
     strncpy(header->saveFilename, saveFilename, MAX_SAVE_FILENAME - 1);
     header->saveFileSize = saveFileSize;
+
+    return 0;
+}
+
+// estimate the compressed output size
+unsigned int compressOutSize(unsigned int dataSize)
+{
+    return compressBound(dataSize);
+}
+
+// compress the buffer
+// outbuffer must have been previously allocated with a size returned by compressOutSize
+// On success
+int compressBuffer(unsigned char* inBuf, unsigned int inBufLen, unsigned char* outBuf, unsigned int* outBufLen)
+{
+    int result = 0;
+    unsigned long compressedLen = *outBufLen; // suppress compiler warning
+
+    result = compress(outBuf, &compressedLen, inBuf, inBufLen);
+    if(result != Z_OK)
+    {
+        jo_core_error("Failed to compress with %d", result);
+        return -1;
+    }
+
+    *outBufLen = compressedLen;
+
+    return 0;
+}
+
+// calculates how many bytes are needed to Reed Solomon encode a buffer
+unsigned int reedSolomonOutSize(unsigned int dataSize)
+{
+    unsigned int numChunks = dataSize/DATA_CHUNK_SIZE;
+
+    // if our data does not fit on a chunk boundary
+    // include another chunk
+    if(dataSize % DATA_CHUNK_SIZE)
+    {
+        numChunks++;
+    }
+
+    return dataSize + (numChunks*PARITY_BYTES);
+}
+
+// Reed Solomon encodes a buffer
+// outbuffer must have been previously allocated with a size returned by reedSolomonOutSize
+int reedSolomonEncode(unsigned char* inBuf, unsigned int inBufLen, unsigned char* outBuf)
+{
+    unsigned int dataWritten = 0;
+
+    for(unsigned int i = 0; i < inBufLen; i += DATA_CHUNK_SIZE)
+    {
+        unsigned int chunkSize = 0;
+
+        if(inBufLen - i >= DATA_CHUNK_SIZE)
+        {
+            chunkSize = DATA_CHUNK_SIZE;
+        }
+        else
+        {
+            chunkSize = inBufLen  - i;
+        }
+
+        correct_reed_solomon_encode(g_reedSolomon, inBuf + i, chunkSize, outBuf + dataWritten);
+
+        dataWritten += CODEWORD_SIZE;
+    }
 
     return 0;
 }
@@ -105,48 +193,6 @@ unsigned int escapeBuffer(unsigned char** buffer, unsigned int* bufferSize)
 
         *buffer = newBuf;
         *bufferSize = newBufSize;
-    }
-
-    return 0;
-}
-
-// calculates how many bytes are needed to Reed Solomon encode a buffer
-unsigned int reedSolomonOutSize(unsigned int dataSize)
-{
-    unsigned int numChunks = dataSize/DATA_CHUNK_SIZE;
-
-    // if our data does not fit on a chunk boundary
-    // include another chunk
-    if(dataSize % DATA_CHUNK_SIZE)
-    {
-        numChunks++;
-    }
-
-    return dataSize + (numChunks*PARITY_BYTES);
-}
-
-// Reed Solomon encodes a buffer
-// outbuffer must have been previously allocated with a size returned by reedSolomonOutSize
-int reedSolomonEncode(unsigned char* inBuf, unsigned int inSize, unsigned char* outBuf)
-{
-    unsigned int dataWritten = 0;
-
-    for(unsigned int i = 0; i < inSize; i += DATA_CHUNK_SIZE)
-    {
-        unsigned int chunkSize = 0;
-
-        if(inSize - i >= DATA_CHUNK_SIZE)
-        {
-            chunkSize = DATA_CHUNK_SIZE;
-        }
-        else
-        {
-            chunkSize = inSize  - i;
-        }
-
-        correct_reed_solomon_encode(g_reedSolomon, inBuf + i, chunkSize, outBuf + dataWritten);
-
-        dataWritten += CODEWORD_SIZE;
     }
 
     return 0;

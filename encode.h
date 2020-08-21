@@ -2,6 +2,8 @@
 #include <jo/jo.h>
 #include "main.h"
 #include "libcorrect/correct.h"
+#include "md5/md5.h"
+#include "miniz/miniz.h"
 
 #define TRANSMISSION_MAGIC_SIZE     4
 #define TRANSMISSION_MAGIC          "SGEX"
@@ -33,8 +35,12 @@ typedef struct _TRANSMISSION_HEADER
 
 extern correct_reed_solomon* g_reedSolomon;
 
+
+int calculateMD5Hash(unsigned char* buffer, unsigned int bufferSize, unsigned char* md5Hash);
 int initializeTransmissionHeader(unsigned char* md5Hash, unsigned int md5HashSize, char* saveFilename, unsigned int saveFileSize);
 unsigned int countEscapeBytes(unsigned char* buffer, unsigned int bufferSize);
 unsigned int escapeBuffer(unsigned char** buffer, unsigned int* bufferSize);
 unsigned int reedSolomonOutSize(unsigned int dataSize);
 int reedSolomonEncode(unsigned char* inBuf, unsigned int inSize, unsigned char* outBuf);
+unsigned int compressOutSize(unsigned int dataSize);
+int compressBuffer(unsigned char* inBuf, unsigned int inBufLen, unsigned char* outBuf, unsigned int* outBufLen);
