@@ -40,25 +40,25 @@ SYNC_BYTE = 0xAB
 # Change an ESCAPE_BYTE followed by SYNC_REPLACE byte to a single SYNC_BYTE
 def unescape(message):
 
-    escapedMessage = ""
+    escapedMessage = b''
 
     i = 0
 
     while(i < len(message)):
 
-        if message[i] == chr(ESCAPE_BYTE):
+        if message[i] == ESCAPE_BYTE:
 
-            if message[i + 1] == chr(ESCAPE_BYTE):
+            if message[i + 1] == ESCAPE_BYTE:
 
                 # two ESCAPE_BYTES, replace with a single ESCAPE_BYTE
-                escapedMessage = escapedMessage + chr(ESCAPE_BYTE)
+                escapedMessage = escapedMessage + ESCAPE_BYTE.to_bytes(1, 'big')
                 i = i + 1
 
-            elif message[i + 1] == chr(SYNC_REPLACE):
+            elif message[i + 1] == SYNC_REPLACE:
 
                 # ESCAPE_BYTE followed by a SYNC_REPLACE
                 # replace with a SYNC_BYTE
-                escapedMessage = escapedMessage + chr(SYNC_BYTE)
+                escapedMessage = escapedMessage + SYNC_BYTE.to_bytes(1, 'big')
                 i = i + 1
 
             else:
@@ -68,7 +68,7 @@ def unescape(message):
         else:
 
             # not an escape byte, continue as normal
-            escapedMessage = escapedMessage + message[i]
+            escapedMessage = escapedMessage + message[i].to_bytes(1, 'big')
 
         i += 1
 
@@ -82,7 +82,6 @@ def main():
     if len(sys.argv) != 2:
         print("Error: Input filename required")
         return -1
-
 
     filename = sys.argv[1]
 
@@ -125,7 +124,7 @@ def main():
     #
     # Decompress the data
     #
-    decompressedBuf = zlib.decompress(str(compressedBuf));
+    decompressedBuf = zlib.decompress(compressedBuf);
 
     #
     # TRANSMISSION_HEADER + variable length save data
@@ -139,7 +138,6 @@ def main():
     # SGEX magic bytes
     magic = decompressedBuf[0:4].decode("utf-8")
     if magic != MAGIC:
-        print magic
         print("Error: The magic bytes are invalid")
         return -1
 
@@ -181,4 +179,9 @@ def main():
     print("Wrote save game " + saveName + " to disk")
 
 if __name__ == "__main__":
+
+    if sys.version_info.major != 3:
+        print("Python 3 required")
+        sys.exit(-1)
+
     main()
