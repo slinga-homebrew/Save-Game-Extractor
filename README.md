@@ -20,7 +20,7 @@ SGEX is not the only method to backup Sega Saturn save games. SGEX has the advan
 | [NetLink](https://segaretro.org/NetLink_Internet_Modem) | No | No | Yes | Yes | It's a modem. It's most likely a pain but you could probably figure out a way to e-mail yourself saves from the internal memory. As it takes up the cartridge slot you obviously can't directly dump cartridge saves. |
 | [Saturn Floppy Drive](https://segaretro.org/Saturn_Floppy_Drive) | No | Yes | Yes | Yes | Saturn FDD is great except PCs can't read their disks. You can use SGEX to transfer your FDD saves to PC. Also, the FDD is $200-$300 on eBay. |
 | [Saturn Gamer's Cartridge](https://ppcenter.webou.net/satcart/#gamers) | No | No | Yes | Yes | Gamer's Cart is amazing but no longer being made. Has an SD slot to transfer saves.  As it takes up the cartridge slot you obviously can't directly dump cartridge saves. |
-| [Satiator ODE](https://www.patreon.com/prof_abrasive) | No | Yes | Yes | Yes | Not released yet, but the Satiator is rumored to supported backing up saves to the ODE. Should support dumping saves from cartridges. Hopefully will be released at a reasonable price. |
+| [Satiator ODE](https://www.patreon.com/prof_abrasive) | No | Yes | Yes | Yes | Not released yet, but the Satiator is rumored to support backing up saves to the ODE. Should support dumping saves from cartridges. |
 | [Action Replay](https://segaretro.org/Action_Replay) | No | No | Yes | Yes | Certain models of the Action Replay have a 25-pin DSUB connector on top. Homebrew has been written to copy data including saves from that port. As it takes up the cartridge slot you obviously can't directly dump cartridge saves.|
 
 ## Usage
@@ -42,7 +42,7 @@ SGEX is not the only method to backup Sega Saturn save games. SGEX has the advan
 ![Transmit](screenshots/transmit.png)
 
 * When your transfer is complete, stop the minimodem process
-* Run the Python script on the transmitted data: python sgex.py mysave.bin
+* Run the Python script on the transmitted data: python3 sgex.py mysave.bin
     * The script should create the save game based on the transmitted data
 
 ![Receive](screenshots/transmit_minimodem.png)
@@ -71,7 +71,7 @@ With significant work it should be possible to increase the throughput. These ar
 * The maximum save file is capped at 128k. This can be adjusted.
 
 ## Receiving Dependencies
-* Python
+* Python3
 * ReedSolo (pip install --upgrade reedsolo)
 * minimodem (apt-get install minimodem)
 
@@ -94,6 +94,6 @@ Save Game Extractor uses code from:
 Want to share your save games on the web? Send them to the [Save Games Collect](https://ppcenter.webou.net/pskai/savedata/) project. Made by Cafe-Alpha, the author of the Gamer's Cartridge.
 
 ## Credits
-Special thanks to Antime, Ponut, VBT, and everyone else at SegaXtreme keeping the Saturn dev. Thank you to Takashi for the original Save Game Copier idea back in ~2002.
+Special thanks to Antime, Ponut, VBT, and everyone else at SegaXtreme keeping the Saturn dev scene alive. Thank you to Takashi for the original Save Game Copier idea back in ~2002.
 
 Thank you to all the great fan translation projects in the works. Helping them was the goal of this project.
