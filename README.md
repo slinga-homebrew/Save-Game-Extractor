@@ -91,7 +91,7 @@ Save Game Extractor uses code from:
 * [miniz](https://github.com/richgel999/miniz) - MIT
 
 ## Saturn Save Games Collect Project
-Want to share your save games on the web? Send them to the [Save Games Collect](https://ppcenter.webou.net/pskai/savedata/) project. Made by Cafe-Alpha, the author of the Gamer's Cartridge.
+Want to share your save games on the web? Send them to the [Save Games Collect](https://ppcenter.webou.net/pskai/savedata/) project. Made by Cafe-Alpha, the author of the Gamer's Cartridge. Please append a ".RAW" to the save filename before submitting.
 
 ## Credits
 Special thanks to Antime, Ponut, VBT, and everyone else at SegaXtreme keeping the Saturn dev scene alive. Thank you to Takashi for the original Save Game Copier idea back in ~2002.

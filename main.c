@@ -1025,6 +1025,11 @@ void collect_draw(void)
     y++;
 
     jo_printf(OPTIONS_X - 3, OPTIONS_Y - 1 + y++, "ppcenter.webou.net/pskai/savedata/");
+    y++;
+
+    jo_printf(OPTIONS_X - 3, OPTIONS_Y - 1 + y++, "Please append \".RAW\" to the save");
+    jo_printf(OPTIONS_X - 3, OPTIONS_Y - 1 + y++, "filename before sending. ");
+
     return;
 }
 
@@ -1095,7 +1100,7 @@ void credits_draw(void)
 
     jo_printf(OPTIONS_X - 3, OPTIONS_Y + y++, "Written to help the fan translation");
     jo_printf(OPTIONS_X - 3, OPTIONS_Y + y++, "community. Can't wait to play the ");
-    jo_printf(OPTIONS_X - 3, OPTIONS_Y + y++, "new translations =). ");
+    jo_printf(OPTIONS_X - 3, OPTIONS_Y + y++, "new translations! ");
     y++;
 
     jo_printf(OPTIONS_X - 3, OPTIONS_Y + y++, " - Slinga");

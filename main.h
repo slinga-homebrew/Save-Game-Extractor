@@ -30,7 +30,7 @@
 #pragma once
 
 // program version, keep this length to avoid having to resize strings
-#define VERSION "0.96"
+#define VERSION "0.97"
 
 // program states
 #define STATE_UNINITIALIZED      0
