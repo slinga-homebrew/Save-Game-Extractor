@@ -70,7 +70,7 @@
 #define BIOS_SEGMENT_SIZE       BIOS_SIZE / BIO_NUM_SEGMENTS
 
 // BUGBUG: adjust this as necessary
-#define MAX_SAVE_SIZE           (512 * 1024) / 4
+#define MAX_SAVE_SIZE           (256 * 1024)
 #define MAX_SAVE_FILENAME       12
 #define MAX_SAVES               50
 #define MAX_SAVES_PER_PAGE      8 // saves per page to list

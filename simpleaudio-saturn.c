@@ -175,7 +175,7 @@ static ssize_t sa_saturn_write(simpleaudio *sa, void *buf, size_t nframes)
     if(g_AudioBuffer == NULL)
     {
         g_AudioBufferSize = nbytes;
-        g_AudioBuffer = jo_malloc_with_behaviour(g_MaxAudioBufferSize, JO_MALLOC_TRY_REUSE_SAME_BLOCK_SIZE);
+        g_AudioBuffer = jo_malloc(g_MaxAudioBufferSize);
         if(g_AudioBuffer == NULL)
         {
             jo_core_error("Failed to jo_malloc");
