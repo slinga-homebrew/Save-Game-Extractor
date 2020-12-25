@@ -148,7 +148,7 @@ def main():
 
     # validate length, shouldn't fail here because of the Reed Solomon check
     if TRANSMISSION_HEADER_SIZE + BUP_HEADER_SIZE + saveSize != len(decompressedBuf):
-        print("Error: Received incorrect number of bytes. Expected " + str(TRANSMISSION_HEADER_SIZE + saveSize) + ", got " + str(len(decompressedBuf)))
+        print("Error: Received incorrect number of bytes. Expected " + str(TRANSMISSION_HEADER_SIZE + BUP_HEADER_SIZE + saveSize) + ", got " + str(len(decompressedBuf)))
         return -1
 
     saveName = decompressedBuf[20:31].decode("utf-8")
@@ -175,7 +175,7 @@ def main():
         outFile.write(decompressedBuf[TRANSMISSION_HEADER_SIZE:])
         outFile.close()
     except:
-        print("Error writing save " + saveName + " to disk")
+        print("Error writing save " + saveName + ".BUP to disk")
         return -1
 
     print("Wrote save game " + saveName + ".BUP to disk")
