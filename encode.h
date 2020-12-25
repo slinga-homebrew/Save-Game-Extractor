@@ -1,14 +1,23 @@
 #pragma once
 #include <jo/jo.h>
+#include "bup_header.h"
 #include "main.h"
 #include "libcorrect/correct.h"
 #include "md5/md5.h"
 #include "miniz/miniz.h"
 
+/*
+ * The entire transmission consists of the TRANSMISSION_HEADER + BUP_HEADER
+ * + variable length save. This data is compressed, then Reed Solomon encoded,
+ * then escaped.
+ */
+
 #define TRANSMISSION_MAGIC_SIZE     4
 #define TRANSMISSION_MAGIC          "SGEX"
 #define TRANSMISSION_HEADER_SIZE    sizeof(TRANSMISSION_HEADER)
 #define MD5_HASH_SIZE               16
+
+#define BUP_HEADER_SIZE             64
 
 #define CODEWORD_SIZE 255ul
 #define PARITY_BYTES 32ul
@@ -38,6 +47,7 @@ extern correct_reed_solomon* g_reedSolomon;
 
 int calculateMD5Hash(unsigned char* buffer, unsigned int bufferSize, unsigned char* md5Hash);
 int initializeTransmissionHeader(unsigned char* md5Hash, unsigned int md5HashSize, char* saveFilename, unsigned int saveFileSize);
+int initializeBUPHeader(char* saveFilename, char* saveComment, unsigned char saveLanguage, unsigned int date, unsigned int saveFileSize);
 unsigned int countEscapeBytes(unsigned char* buffer, unsigned int bufferSize);
 unsigned int escapeBuffer(unsigned char** buffer, unsigned int* bufferSize);
 unsigned int reedSolomonOutSize(unsigned int dataSize);

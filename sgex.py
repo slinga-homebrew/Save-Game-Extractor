@@ -2,13 +2,12 @@
 # Save Game Extractor (GPL3)
 # https://github.com/slinga-homebrew/Save-Game-Extractor
 #
-# This script parses an encoded transmission from the Sega Saturn,
-# validates it, and writes it out to disk
+# This script parses an encoded transmission from the Sega Saturn, validates it
+# and writes it out to disk.
 #
-# The transmission consists of a TRANSMISSION_HEADER followed by a
-# variable number of bytes of data. The transmission is zipped,
-# Reed Solomon encoded, and then escaped. This Python script
-# undoes all of that.
+# The transmission consists of a TRANSMISSION_HEADER and a BUP_HEADER followed
+# by a variable number of bytes of data. The transmission is zipped, Reed
+# Solomon encoded, and then escaped. This Python script undoes all of that.
 #
 
 import sys
@@ -27,10 +26,13 @@ typedef struct _TRANSMISSION_HEADER
     unsigned int saveFileSize;  // size of the file in bytes
     unsigned char saveFileData[0]; // saveFileSize number of bytes of save data
 } TRANSMISSION_HEADER, *PTRANSMISSION_HEADER;
+
+Taken from bup_header.h
 '''
 
 MAGIC = "SGEX"
 TRANSMISSION_HEADER_SIZE = 36
+BUP_HEADER_SIZE = 64
 
 ESCAPE_BYTE = 0x54
 SYNC_REPLACE = 0x9F
@@ -145,7 +147,7 @@ def main():
     saveSize = int(saveSize, 16)
 
     # validate length, shouldn't fail here because of the Reed Solomon check
-    if TRANSMISSION_HEADER_SIZE + saveSize != len(decompressedBuf):
+    if TRANSMISSION_HEADER_SIZE + BUP_HEADER_SIZE + saveSize != len(decompressedBuf):
         print("Error: Received incorrect number of bytes. Expected " + str(TRANSMISSION_HEADER_SIZE + saveSize) + ", got " + str(len(decompressedBuf)))
         return -1
 
@@ -153,7 +155,7 @@ def main():
     md5Hash = binascii.b2a_hex(decompressedBuf[4:20]).decode("utf-8")
 
     # verify the MD5 hash. Again shouldn't ever fail here due to the Reed Solomon check
-    computedHashResult = hashlib.md5(decompressedBuf[TRANSMISSION_HEADER_SIZE:])
+    computedHashResult = hashlib.md5(decompressedBuf[TRANSMISSION_HEADER_SIZE + BUP_HEADER_SIZE:])
     computedHash = computedHashResult.hexdigest()
 
     print("Transmitted Filename: " + saveName)
@@ -167,16 +169,16 @@ def main():
     else:
         print("MD5 hashes validate, save is correct.")
 
-    # create the output file
+    # create the output .BUP file
     try:
-        outFile = open(saveName, "wb")
-        outFile.write(decompressedBuf[36:])
+        outFile = open(saveName + ".BUP", "wb")
+        outFile.write(decompressedBuf[TRANSMISSION_HEADER_SIZE:])
         outFile.close()
     except:
         print("Error writing save " + saveName + " to disk")
         return -1
 
-    print("Wrote save game " + saveName + " to disk")
+    print("Wrote save game " + saveName + ".BUP to disk")
 
 if __name__ == "__main__":
 

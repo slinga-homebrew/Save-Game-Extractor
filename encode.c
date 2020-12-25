@@ -50,6 +50,37 @@ int initializeTransmissionHeader(unsigned char* md5Hash, unsigned int md5HashSiz
     return 0;
 }
 
+int initializeBUPHeader(char* saveFilename, char* saveComment, unsigned char saveLanguage, unsigned int date, unsigned int saveFileSize)
+{
+    PBUP_HEADER header = (PBUP_HEADER)(g_Game.transmissionData + sizeof(TRANSMISSION_HEADER));
+
+    if(saveFilename == NULL || saveComment == NULL ||
+       saveFileSize == 0)
+    {
+        jo_core_error("Invalid parameters to initialize BUP header!!");
+        return -1;
+    }
+
+    // the majority of the structure is set to zero
+    jo_memset(header, 0, sizeof(BUP_HEADER));
+
+    // "Vmem" magic
+    memcpy(header->magic, VMEM_MAGIC_STRING, VMEM_MAGIC_STRING_LEN);
+
+    // save metadata
+    strncpy(header->dir.filename, saveFilename, JO_BACKUP_MAX_FILENAME_LENGTH);
+    strncpy(header->dir.comment, saveComment, JO_BACKUP_MAX_COMMENT_LENGTH + 1);
+    header->dir.language = saveLanguage;
+    header->dir.date = date;
+    header->dir.datasize = saveFileSize;
+    header->dir.blocksize = 0; // not used
+
+    // date is duplicated
+    header->date = date;
+    return 0;
+}
+
+
 // estimate the compressed output size
 unsigned int compressOutSize(unsigned int dataSize)
 {

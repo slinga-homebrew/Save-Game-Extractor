@@ -30,7 +30,7 @@
 #pragma once
 
 // program version, keep this length to avoid having to resize strings
-#define VERSION "0.97"
+#define VERSION "0.98"
 
 // program states
 #define STATE_UNINITIALIZED      0
@@ -72,6 +72,7 @@
 // BUGBUG: adjust this as necessary
 #define MAX_SAVE_SIZE           (256 * 1024)
 #define MAX_SAVE_FILENAME       12
+#define MAX_SAVE_COMMENT        11
 #define MAX_SAVES               50
 #define MAX_SAVES_PER_PAGE      8 // saves per page to list
 
@@ -117,9 +118,12 @@ typedef struct _GAME
     bool listedSaves; // set to true if we already queried the saves from the backup device
 
     char saveFilename[MAX_SAVE_FILENAME]; // selected save file name
+    char saveComment[MAX_SAVE_COMMENT]; // selected save comment
+    unsigned char saveLanguage; // selected save language
+    unsigned int saveDate; // selected save date;
     unsigned int saveFileSize; // selected save file size
-    unsigned char* saveFileData; // the raw data, points at transmissonFileData + TRANSMISSION_HEADER_SIZE
-    unsigned char* transmissionData; // consists of TRANSMISSION_HEADER + variable length saveFileData
+    unsigned char* saveFileData; // the raw data, points at transmissonFileData + TRANSMISSION_HEADER_SIZE + BUP_HEADER_SIZE
+    unsigned char* transmissionData; // consists of TRANSMISSION_HEADER + BUP_HEADER + variable length saveFileData
                                      // not encoded or escaped in any form
 
     unsigned int compressedSize; // size after compression
@@ -142,6 +146,9 @@ typedef struct _GAME
 // meta data related to save files
 typedef  struct  _SAVES {
     char filename[MAX_SAVE_FILENAME];
+    char comment[MAX_SAVE_COMMENT];
+    unsigned char language;
+    unsigned int date;
     unsigned int datasize;
     unsigned short blocksize;
 } SAVES, *PSAVES;

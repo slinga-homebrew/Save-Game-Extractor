@@ -38,6 +38,8 @@
 GAME g_Game = {0};
 SAVES g_Saves[MAX_SAVES] = {0};
 
+#define BUP_HEADER_SIZE 0x40
+
 void jo_main(void)
 {
     int result = 0;
@@ -48,13 +50,14 @@ void jo_main(void)
     jo_add_memory_zone((unsigned char *)LWRAM, LWRAM_HEAP_SIZE);
 
     // allocate our save file buffer
-    g_Game.transmissionData = jo_malloc(MAX_SAVE_SIZE + TRANSMISSION_HEADER_SIZE);
+    // the buffer consists of the transmission header + bup header + save data
+    g_Game.transmissionData = jo_malloc(TRANSMISSION_HEADER_SIZE + BUP_HEADER_SIZE + MAX_SAVE_SIZE);
     if(g_Game.transmissionData == NULL)
     {
         jo_core_error("Failed to allocated save file data buffer!!");
         return;
     }
-    g_Game.saveFileData = g_Game.transmissionData + TRANSMISSION_HEADER_SIZE;
+    g_Game.saveFileData = g_Game.transmissionData + TRANSMISSION_HEADER_SIZE + BUP_HEADER_SIZE;
 
     // init Saturn minimodem
     result = SaturnMinimodem_init();
@@ -412,6 +415,9 @@ int readSaveFiles(jo_backup_device backupDevice, PSAVES fileSaves, unsigned int 
 
     for(unsigned int i = 0; i < (unsigned int)saveFilenames.count && i < numSaves; i++)
     {
+        char comment[MAX_SAVE_COMMENT] = {0};
+        unsigned char language = 0;
+        unsigned int date = 0;
         unsigned int numBytes = 0;
         unsigned int numBlocks = 0;
 
@@ -423,14 +429,18 @@ int readSaveFiles(jo_backup_device backupDevice, PSAVES fileSaves, unsigned int 
             return -1;
         }
 
-        result = jo_backup_get_file_size(backupDevice, filename, &numBytes, &numBlocks);
+        // query the save metadata
+        result = jo_backup_get_file_info(backupDevice, filename, comment, &language, &date, &numBytes, &numBlocks);
         if(result == false)
         {
             jo_core_error("Failed to read file size!!");
             return -1;
         }
 
-        strncpy((char*)&fileSaves[i].filename, filename, MAX_SAVE_FILENAME);
+        strncpy((char*)fileSaves[i].filename, filename, MAX_SAVE_FILENAME);
+        strncpy((char*)fileSaves[i].comment, comment, MAX_SAVE_COMMENT);
+        fileSaves[i].language = language;
+        fileSaves[i].date = date;
         fileSaves[i].datasize = numBytes;
         fileSaves[i].blocksize = numBlocks;
         count++;
@@ -507,7 +517,7 @@ void listSaves_draw(void)
         int j = 0;
 
         // header
-        jo_printf(OPTIONS_X, OPTIONS_Y, "%-11s %10s %6s", "Filename", "Bytes", "Blocks");
+        jo_printf(OPTIONS_X, OPTIONS_Y, "%-11s  %-10s  %6s", "Filename", "Comment", "Bytes");
 
         // zero out the save print fields otherwise we will have stale data on the screen
         // when we go to other pages
@@ -519,7 +529,7 @@ void listSaves_draw(void)
         // print up to MAX_SAVES_PER_PAGE saves on the screen
         for(i = (g_Game.cursorOffset / MAX_SAVES_PER_PAGE) * MAX_SAVES_PER_PAGE, j = 0; i < g_Game.numSaves && j < MAX_SAVES_PER_PAGE; i++, j++)
         {
-            jo_printf(OPTIONS_X, OPTIONS_Y + (i % MAX_SAVES_PER_PAGE) + 1, "%-11s %10d %6d", g_Saves[i].filename, g_Saves[i].datasize, g_Saves[i].blocksize);
+            jo_printf(OPTIONS_X, OPTIONS_Y + (i % MAX_SAVES_PER_PAGE) + 1, "%-11s  %-10s  %6d", g_Saves[i].filename, g_Saves[i].comment, g_Saves[i].datasize);
         }
 
         g_Game.numStateOptions = g_Game.numSaves;
@@ -531,7 +541,11 @@ void listSaves_draw(void)
 
     if(g_Game.numStateOptions > 0)
     {
+        // copy the save data
         memcpy(g_Game.saveFilename, g_Saves[g_Game.cursorOffset].filename, MAX_SAVE_FILENAME);
+        strncpy(g_Game.saveComment, g_Saves[g_Game.cursorOffset].comment, MAX_SAVE_COMMENT);
+        g_Game.saveLanguage = g_Saves[g_Game.cursorOffset].language;
+        g_Game.saveDate = g_Saves[g_Game.cursorOffset].date;
         g_Game.saveFileSize = g_Saves[g_Game.cursorOffset].datasize;
 
         jo_printf(g_Game.cursorPosX, g_Game.cursorPosY + g_Game.cursorOffset % MAX_SAVES_PER_PAGE, ">>");
@@ -627,10 +641,9 @@ void playSaves_draw(void)
         unsigned char* compressedBuffer = NULL;
         g_Game.compressedSize = 0;
 
+        //
         // print messages to the user so that can get an estimate of the time for longer operations
-
-
-
+        //
         result = calculateMD5Hash(g_Game.saveFileData, g_Game.saveFileSize, g_Game.md5Hash);
         if(result != 0)
         {
@@ -648,12 +661,21 @@ void playSaves_draw(void)
             return;
         }
 
+        // bup header
+        initializeBUPHeader(g_Game.saveFilename, g_Game.saveComment, g_Game.saveLanguage, g_Game.saveDate, g_Game.saveFileSize);
+        if(result != 0)
+        {
+            // something went wrong
+            transitionToState(STATE_MAIN);
+            return;
+        }
+
         //
         // Compress the save
         //
 
         // estimate the compressed output size
-        uncompressedSize = TRANSMISSION_HEADER_SIZE + g_Game.saveFileSize;
+        uncompressedSize = TRANSMISSION_HEADER_SIZE + BUP_HEADER_SIZE + g_Game.saveFileSize;
         g_Game.compressedSize = compressOutSize(uncompressedSize);
 
         compressedBuffer = jo_malloc(g_Game.compressedSize);
@@ -719,6 +741,8 @@ void playSaves_draw(void)
     }
 
     jo_printf(OPTIONS_X, OPTIONS_Y + y++, "Filename: %s        ", g_Game.saveFilename);
+    jo_printf(OPTIONS_X, OPTIONS_Y + y++, "Comment: %s         ", g_Game.saveComment);
+    jo_printf(OPTIONS_X, OPTIONS_Y + y++, "Date: %x %d         ", g_Game.saveDate, g_Game.saveDate);
     jo_printf(OPTIONS_X, OPTIONS_Y + y++, "Size: %d            ", g_Game.saveFileSize);
     jo_printf(OPTIONS_X, OPTIONS_Y + y++, "Compressed Size: %d            ", g_Game.compressedSize);
     jo_printf(OPTIONS_X, OPTIONS_Y + y++, "Total Size: %d          ", g_Game.encodedTransmissionSize);
