@@ -11,7 +11,7 @@ JO_DEBUG = 1
 JO_NTSC = 1
 JO_COMPILE_USING_SGL = 1
 MINIZ_NO_TIME = 1
-SRCS=main.c util.c encode.c md5/md5.c simpleaudio-saturn.c saturn-minimodem.c simple-tone-generator.c simpleaudio.c databits_ascii.c libcorrect/encode.c libcorrect/reed-solomon.c libcorrect/polynomial.c miniz/miniz.c
+SRCS=main.c util.c encode.c bup_header.c md5/md5.c simpleaudio-saturn.c saturn-minimodem.c simple-tone-generator.c simpleaudio.c databits_ascii.c libcorrect/encode.c libcorrect/reed-solomon.c libcorrect/polynomial.c miniz/miniz.c
 JO_ENGINE_SRC_DIR=../../jo_engine
 COMPILER_DIR=../../Compiler
 include $(COMPILER_DIR)/COMMON/jo_engine_makefile
