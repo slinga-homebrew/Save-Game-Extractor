@@ -43,9 +43,12 @@ SGEX is not the only method to backup Sega Saturn save games. SGEX has the advan
 
 * When your transfer is complete, stop the minimodem process
 * Run the Python script on the transmitted data: python3 sgex.py mysave.bin
-    * The script should create the save game based on the transmitted data
+    * The script should create the save game (in .BUP format) based on the transmitted data
 
 ![Receive](screenshots/transmit_minimodem.png)
+
+## .BUP File Format
+SGEX outputs saves in the .BUP save format. The format is documented in [Save Game BUP Scripts](https://github.com/slinga-homebrew/Save-Game-BUP-Scripts) along with a script to convert between .BUP and raw saves. 
 
 ## Frequently Asked Questions
 * Can I copy saves from a backup cartridge? Answer: yes.
@@ -91,9 +94,11 @@ Save Game Extractor uses code from:
 * [miniz](https://github.com/richgel999/miniz) - MIT
 
 ## Saturn Save Games Collect Project
-Want to share your save games on the web? Send them to the [Save Games Collect](https://ppcenter.webou.net/pskai/savedata/) project. Made by Cafe-Alpha, the author of the Gamer's Cartridge. Please append a ".RAW" to the save filename before submitting.
+Want to share your save games on the web? Send your .BUP files to the [Save Games Collect](https://ppcenter.webou.net/pskai/savedata/) project. Made by Cafe-Alpha, the author of the Gamer's Cartridge.
 
 ## Credits
+Thank you to Johannes Fetz for numerous additions to Jo Engine to support SGC and SGEX. 
+
 Special thanks to Antime, Ponut, VBT, and everyone else at SegaXtreme keeping the Saturn dev scene alive. Thank you to Takashi for the original Save Game Copier idea back in ~2002.
 
 Thank you to all the great fan translation projects in the works. Helping them was the goal of this project.
