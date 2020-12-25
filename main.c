@@ -38,8 +38,6 @@
 GAME g_Game = {0};
 SAVES g_Saves[MAX_SAVES] = {0};
 
-#define BUP_HEADER_SIZE 0x40
-
 void jo_main(void)
 {
     int result = 0;
@@ -624,6 +622,7 @@ void playSaves_draw(void)
     int y = 0;
     unsigned int bytesTransferred = 0;
     unsigned int totalSize = 0;
+    jo_backup_date jo_date = {0};
 
     if(g_Game.state != STATE_PLAY_SAVES)
     {
@@ -740,9 +739,17 @@ void playSaves_draw(void)
         g_Game.md5Calculated = true;
     }
 
+    // convert between internal date and jo_date
+    bup_getdate(g_Game.saveDate, &jo_date);
+
     jo_printf(OPTIONS_X, OPTIONS_Y + y++, "Filename: %s        ", g_Game.saveFilename);
     jo_printf(OPTIONS_X, OPTIONS_Y + y++, "Comment: %s         ", g_Game.saveComment);
-    jo_printf(OPTIONS_X, OPTIONS_Y + y++, "Date: %x %d         ", g_Game.saveDate, g_Game.saveDate);
+    jo_printf(OPTIONS_X, OPTIONS_Y + y++, "Date: %d/%d/%d %d:%d         ", jo_date.month, jo_date.day, jo_date.year + 1980, jo_date.time, jo_date.min);
+    jo_printf(OPTIONS_X, OPTIONS_Y + y++, "MD5: %02x%02x%02x%02x%02x%02x%02x%02x", g_Game.md5Hash[0], g_Game.md5Hash[1], g_Game.md5Hash[2], g_Game.md5Hash[3], g_Game.md5Hash[4], g_Game.md5Hash[5], g_Game.md5Hash[6], g_Game.md5Hash[7]);
+    jo_printf(OPTIONS_X, OPTIONS_Y + y++, "     %02x%02x%02x%02x%02x%02x%02x%02x", g_Game.md5Hash[8], g_Game.md5Hash[9], g_Game.md5Hash[10], g_Game.md5Hash[11],  g_Game.md5Hash[12], g_Game.md5Hash[13], g_Game.md5Hash[14], g_Game.md5Hash[15]);
+
+    y++;
+
     jo_printf(OPTIONS_X, OPTIONS_Y + y++, "Size: %d            ", g_Game.saveFileSize);
     jo_printf(OPTIONS_X, OPTIONS_Y + y++, "Compressed Size: %d            ", g_Game.compressedSize);
     jo_printf(OPTIONS_X, OPTIONS_Y + y++, "Total Size: %d          ", g_Game.encodedTransmissionSize);
@@ -760,8 +767,6 @@ void playSaves_draw(void)
     int estimatedTimeLeft = ((g_Game.encodedTransmissionSize - bytesTransferred) * 8)/ESTIMATED_TRANSFER_SPEED;
     jo_printf(OPTIONS_X, OPTIONS_Y + y++, "Est Time: %d                   ", estimatedTimeLeft);
 
-    jo_printf(OPTIONS_X, OPTIONS_Y + y++, "MD5: %02x%02x%02x%02x%02x%02x%02x%02x", g_Game.md5Hash[0], g_Game.md5Hash[1], g_Game.md5Hash[2], g_Game.md5Hash[3], g_Game.md5Hash[4], g_Game.md5Hash[5], g_Game.md5Hash[6], g_Game.md5Hash[7]);
-    jo_printf(OPTIONS_X, OPTIONS_Y + y++, "     %02x%02x%02x%02x%02x%02x%02x%02x", g_Game.md5Hash[8], g_Game.md5Hash[9], g_Game.md5Hash[10], g_Game.md5Hash[11],  g_Game.md5Hash[12], g_Game.md5Hash[13], g_Game.md5Hash[14], g_Game.md5Hash[15]);
 
      y++;
 
@@ -1045,14 +1050,13 @@ void collect_draw(void)
     // message
     jo_printf(OPTIONS_X - 3, OPTIONS_Y - 1 + y++, "Want to share your saves with");
     jo_printf(OPTIONS_X - 3, OPTIONS_Y - 1 + y++, "others?");
-    jo_printf(OPTIONS_X - 3, OPTIONS_Y - 1 + y++, "Send them to Cafe-Alpha:");
+    y++;
+
+    jo_printf(OPTIONS_X - 3, OPTIONS_Y - 1 + y++, "Send your .BUP files to Cafe-Alpha:");
     y++;
 
     jo_printf(OPTIONS_X - 3, OPTIONS_Y - 1 + y++, "ppcenter.webou.net/pskai/savedata/");
     y++;
-
-    jo_printf(OPTIONS_X - 3, OPTIONS_Y - 1 + y++, "Please append \".RAW\" to the save");
-    jo_printf(OPTIONS_X - 3, OPTIONS_Y - 1 + y++, "filename before sending. ");
 
     return;
 }
