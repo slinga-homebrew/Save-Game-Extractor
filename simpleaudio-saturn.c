@@ -128,7 +128,7 @@ bool sa_saturn_flush_buffer()
 
     if(g_AudioBufferSize < 20000)
     {
-        jo_printf(2, 23, "What the heck too small: %d                       ", g_AudioBufferSize);
+        jo_printf(2, 23, "Small buffer size, possible error: %d                       ", g_AudioBufferSize);
     }
 
     if(g_AudioBufferSize < FLUSH_BUFFER_MIN)
