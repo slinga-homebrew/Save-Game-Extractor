@@ -64,6 +64,7 @@ With significant work it should be possible to increase the throughput. These ar
 * The Saturn has dual CPUs, I'm using only one of them.
 
 ## Issues
+* Does not work on 50 Hz (PAL) region Saturns. Unfortunately I don't own one to test with.  
 * Throughput needs to be improved as mentioned.
 * Only tested on Linux. Should work on other platforms provided you can run minimodem.
 * The transmission buffer is escaped after being Reed Solomon encoded. This means that if 1) an escape character is corrupted or 2) a character is flipped into the escape character the unescape function will fail and Reed Solomon won't be able to recover. The correct solution is to modify Reed Solomon to not use all 255 bits but this seems like a real pain with the library I chose to use.
