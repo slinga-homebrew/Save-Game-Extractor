@@ -870,6 +870,24 @@ void dumpBios_draw(void)
         jo_printf(OPTIONS_X, OPTIONS_Y + i + 1, "%-11s %10d", BIOS_FILENAMES[i], BIOS_SIZE/4);
     }
 
+    if(g_Game.md5BiosCalculated == false)
+	{
+		int result = 0;
+
+		result = calculateMD5Hash(BIOS_START_ADDR, BIOS_SIZE, g_Game.md5BiosHash);
+		if(result != 0)
+		{
+			// something went wrong
+			transitionToState(STATE_MAIN);
+			return;
+		}
+
+		g_Game.md5BiosCalculated = true;
+	}
+
+    jo_printf(OPTIONS_X, OPTIONS_Y + 6, "BIOS MD5: %02x%02x%02x%02x%02x%02x%02x%02x", g_Game.md5BiosHash[0], g_Game.md5BiosHash[1], g_Game.md5BiosHash[2], g_Game.md5BiosHash[3], g_Game.md5BiosHash[4], g_Game.md5BiosHash[5], g_Game.md5BiosHash[6], g_Game.md5BiosHash[7]);
+    jo_printf(OPTIONS_X, OPTIONS_Y + 7, "          %02x%02x%02x%02x%02x%02x%02x%02x", g_Game.md5BiosHash[8], g_Game.md5BiosHash[9], g_Game.md5BiosHash[10], g_Game.md5BiosHash[11],  g_Game.md5BiosHash[12], g_Game.md5BiosHash[13], g_Game.md5BiosHash[14], g_Game.md5BiosHash[15]);
+
     // bugbug use strncpy here
     strncpy(g_Game.saveFilename, BIOS_FILENAMES[g_Game.cursorOffset], sizeof(g_Game.saveFilename) - 1);
     g_Game.saveFileSize = BIOS_SIZE/4;

@@ -30,7 +30,7 @@
 #pragma once
 
 // program version, keep this length to avoid having to resize strings
-#define VERSION "0.98"
+#define VERSION "0.99"
 
 // program states
 #define STATE_UNINITIALIZED      0
@@ -64,7 +64,7 @@
 #define BIOS_NUM_OPTIONS         4
 
 #define BIOS_FILENAME           "bios.bin"
-#define BIOS_START_ADDR         0x00000000
+#define BIOS_START_ADDR         524288
 #define BIOS_SIZE               512 * 1024
 #define BIO_NUM_SEGMENTS        4 // how many segments to split the bios into
 #define BIOS_SEGMENT_SIZE       BIOS_SIZE / BIO_NUM_SEGMENTS
@@ -137,6 +137,9 @@ typedef struct _GAME
 
     bool md5Calculated; // set to true if we have calculated the md5 MD5_HASH_SIZE
     unsigned char md5Hash[MD5_HASH_SIZE];
+
+	bool md5BiosCalculated; // set to true if we have calculated the md5 MD5_HASH_SIZE
+    unsigned char md5BiosHash[MD5_HASH_SIZE];
 
     // hack to cache controller inputs
     INPUTCACHE input;
