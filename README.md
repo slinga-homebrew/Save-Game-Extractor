@@ -1,5 +1,5 @@
 # Save Game Extractor (SGEX)
-Transmit Sega Saturn save game files as audio to backup on a PC. Based on the amazing [minimodem](https://github.com/kamalmostafa/minimodem). Currently transfer speeds are ~70 bits/second. Build with [Jo Engine](https://github.com/johannes-fetz/joengine) or download an ISO from [releases](https://github.com/slinga-homebrew/Save-Game-Extractor/releases).
+Transmit Sega Saturn save game files as audio to backup on a PC. Based on the amazing [minimodem](https://github.com/kamalmostafa/minimodem). Currently transfer speeds are ~70 bits/second. Build with [Jo Engine](https://github.com/johannes-fetz/joengine) or download an ISO from [releases](https://github.com/slinga-homebrew/Save-Game-Extractor/releases). Requires a modded Saturn or another method to get code running on actual hardware. 
 
 ## Demo Video
 [Demo Video](https://github.com/slinga-homebrew/Save-Game-Extractor/blob/master/screenshots/demo.mkv)
